@@ -1,5 +1,6 @@
 import { showMessage } from "react-native-flash-message";
 import API from "../config/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 class BarberosRepository {
 
@@ -31,15 +32,14 @@ class BarberosRepository {
         }
     }
 
-    static async TraerUsuario(email) {
+    static async traerUsuarios() {
         try {
-            const response = await API.get(`traerUsuario/${email}`);
+            const response = await API.get("traerUsuarios"); // <-- Debes tener este endpoint en tu backend
             return response;
         } catch (error) {
-            const errorMessage = error?.response?.data?.message || "Error al obtener el usuario.";
+            const errorMessage = error?.response?.data?.message || "Error al obtener los usuarios.";
             throw new Error(errorMessage);
         }
-
     }
 
 

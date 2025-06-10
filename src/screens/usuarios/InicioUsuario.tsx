@@ -47,17 +47,27 @@ export default function InicioUsuario() {
   const screenWidth = Dimensions.get("window").width;
   const cardWidth = (screenWidth - 60 - 15) / 2;
 
+  const [observacion, setObservacion] = useState(""); // NUEVO: Observación
+
   const nextStep = () => {
     if (currentStep === 1 && !service) {
       alert("Por favor, selecciona un servicio antes de continuar.");
       return;
     }
-
     if (currentStep === 2 && !barberoId) {
       alert("Por favor, selecciona un barbero antes de continuar.");
       return;
     }
-
+    // Si selecciona Corte básico (id_tipo_servicio === 1), muestra paso de observación
+    if (currentStep === 3 && service === 1) {
+      setCurrentStep(4);
+      return;
+    }
+    // Si selecciona Corte premium (id_tipo_servicio === 2), reserva directamente
+    if (currentStep === 3 && service === 2) {
+      handleSubmit();
+      return;
+    }
     setCurrentStep((prevStep) => prevStep + 1);
   };
 
@@ -164,8 +174,7 @@ export default function InicioUsuario() {
     if (!service || !barberoId || !date) {
       showMessage({
         message: "Campos incompletos",
-        description:
-          "Por favor, selecciona el servicio, barbero y fecha antes de continuar.",
+        description: "Por favor, selecciona el servicio, barbero y fecha antes de continuar.",
         type: "warning",
         icon: "warning",
       });
@@ -176,13 +185,11 @@ export default function InicioUsuario() {
 
     try {
       const response = await ReservasClientesRepository.GetBarberosDisponibles(barberoId);
-
       const horasOcupadas = response.data.map(reserva => moment(reserva.fecha).format('YYYY-MM-DD HH:mm:ss'));
       if (horasOcupadas.includes(formattedSelectedDate)) {
         showMessage({
           message: "Hora ocupada",
-          description:
-            "La hora seleccionada ya está ocupada. Por favor, elige otra hora.",
+          description: "La hora seleccionada ya está ocupada. Por favor, elige otra hora.",
           type: "warning",
           icon: "warning",
         });
@@ -191,15 +198,14 @@ export default function InicioUsuario() {
       const token = await AsyncStorage.getItem("token");
       const tokenDecoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
       const id = tokenDecoded?.id || null;
-      const responseCrearReserva =
-        await ReservasClientesRepository.CrearReservas({
-          cliente_id: id,
-          barbero_id: barberoId,
-          servicio: service,
-          fecha: formattedSelectedDate,
-          estado: "Pendiente",
-          observacion: "",
-        });
+      await ReservasClientesRepository.CrearReservas({
+        cliente_id: id,
+        barbero_id: barberoId,
+        servicio: Number(service),
+        fecha: formattedSelectedDate,
+        estado: "Pendiente",
+        observacion: observacion.trim() === "" ? null : observacion, // <--- aquí
+      });
 
       showMessage({
         message: "Reserva creada exitosamente",
@@ -212,6 +218,7 @@ export default function InicioUsuario() {
       setService('');
       setBarberoId('');
       setDate(new Date());
+      setObservacion(""); // Limpia observación
     } catch (error) {
       console.log("Error al crear la reserva:", error);
       showMessage({
@@ -240,7 +247,7 @@ export default function InicioUsuario() {
     });
     traerCalificaciones();
   }, []);
-  
+
 
   const [nuevaCalificacion, setNuevaCalificacion] = useState({
     id: id,
@@ -270,7 +277,7 @@ export default function InicioUsuario() {
       console.log("Error al enviar la calificación:", err);
     }
   };
-  
+
 
 
 
@@ -369,19 +376,33 @@ export default function InicioUsuario() {
                   onPress={() => setService(servicio.id_tipo_servicio)}
                 >
                   <Text style={styles.cardTextService}>{servicio.nombre}</Text>
-
-                  {/* Aquí es donde asociamos la imagen */}
                   <Image
                     style={styles.cardImage}
                     source={imagenesServicios[servicio.nombre]}
                   />
-
                   <Text style={styles.textDescripcion}>
                     {servicio.descripcion_S}
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
+            <TouchableOpacity
+              style={styles.buttonReserva}
+              onPress={() => {
+                if (!service) {
+                  showMessage({
+                    message: "Error",
+                    description: "Selecciona un servicio",
+                    type: "danger",
+                    icon: "danger",
+                  });
+                  return;
+                }
+                setCurrentStep(2);
+              }}
+            >
+              <Text style={styles.buttonText}>Siguiente</Text>
+            </TouchableOpacity>
           </>
         )}
 
@@ -415,6 +436,31 @@ export default function InicioUsuario() {
                   </Text>
                 </TouchableOpacity>
               ))}
+            </View>
+            <View style={{ flexDirection: "row", marginTop: 20 }}>
+              <TouchableOpacity
+                style={styles.buttonReserva}
+                onPress={() => setCurrentStep(1)}
+              >
+                <Text style={styles.buttonText}>Atrás</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.buttonReserva}
+                onPress={() => {
+                  if (!barberoId) {
+                    showMessage({
+                      message: "Error",
+                      description: "Selecciona un barbero",
+                      type: "danger",
+                      icon: "danger",
+                    });
+                    return;
+                  }
+                  setCurrentStep(3);
+                }}
+              >
+                <Text style={styles.buttonText}>Siguiente</Text>
+              </TouchableOpacity>
             </View>
           </>
         )}
@@ -480,74 +526,91 @@ export default function InicioUsuario() {
                   marginBottom: 20,
                 }}
               >
-                Fecha y hora seleccionada:{"        "}
+                Fecha y hora seleccionada:{" "}
                 {date.toLocaleString()}
               </Text>
             </View>
+            <View style={{ flexDirection: "row", marginTop: 20 }}>
+              <TouchableOpacity
+                style={styles.buttonReserva}
+                onPress={() => setCurrentStep(2)}
+              >
+                <Text style={styles.buttonText}>Atrás</Text>
+              </TouchableOpacity>
+              {service === 1 ? (
+                <TouchableOpacity
+                  style={styles.buttonReserva}
+                  onPress={() => {
+                    if (!date) {
+                      showMessage({
+                        message: "Error",
+                        description: "Selecciona una fecha y hora",
+                        type: "danger",
+                        icon: "danger",
+                      });
+                      return;
+                    }
+                    setCurrentStep(4);
+                  }}
+                >
+                  <Text style={styles.buttonText}>Siguiente</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={styles.buttonReserva}
+                  onPress={() => {
+                    if (!date) {
+                      showMessage({
+                        message: "Error",
+                        description: "Selecciona una fecha y hora",
+                        type: "danger",
+                        icon: "danger",
+                      });
+                      return;
+                    }
+                    handleSubmit();
+                  }}
+                >
+                  <Text style={styles.buttonText}>Confirmar Reserva</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </>
         )}
-        {/* Aqui termina el paso a paso Step */}
 
-        <View style={{ flexDirection: "row", marginTop: 20 }}>
-          {currentStep > 1 && (
-            <TouchableOpacity
-              style={styles.buttonReserva}
-              onPress={prevStep}
-            >
-              <Text style={styles.buttonText}>Atrás</Text>
-            </TouchableOpacity>
-          )}
-          {currentStep < 3 && (
-            <TouchableOpacity
-              style={styles.buttonReserva}
-              onPress={() => {
-                if (currentStep === 1 && !service) {
-                  showMessage({
-                    message: "Error",
-                    description: "Selecciona un servicio",
-                    type: "danger",
-                    icon: "danger",
-                  });
-                  return;
-                }
-                if (currentStep === 2 && !barberoId) {
-                  showMessage({
-                    message: "Error",
-                    description: "Selecciona un barbero",
-                    type: "danger",
-                    icon: "danger",
-                  });
-                  return;
-                }
-                if (currentStep === 3 && !date) {
-                  showMessage({
-                    message: "Error",
-                    description: "Selecciona una fecha y hora",
-                    type: "danger",
-                    icon: "danger",
-                  });
-                  return;
-                }
-                setCurrentStep(currentStep + 1);
-              }}
-            >
-              <Text style={styles.buttonText}>Siguiente</Text>
-            </TouchableOpacity>
-          )}
-          {currentStep === 3 && (
-            <TouchableOpacity
-              style={styles.buttonReserva}
-              onPress={() => {
-                handleSubmit();
-                setCurrentStep(1);
-              }}
-            >
-              <Text style={styles.buttonText}>
-                Confirmar Reserva
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
+        {/* Paso 4: Observación (solo para Corte básico) */}
+        {currentStep === 4 && service === 1 && (
+          <>
+            <Text style={styles.textPaso}>
+              Observaciones adicionales <Text style={{ color: "#dc3545" }}>(opcional)</Text>
+            </Text>
+            <TextInput
+              style={styles.input}
+              multiline={true}
+              numberOfLines={4}
+              textAlignVertical="top"
+              onChangeText={setObservacion}
+              value={observacion}
+              placeholder="Si deseas añadirle algo a tu corte háznoslo saber"
+              placeholderTextColor="#bbb"
+            />
+            <View style={{ flexDirection: "row", marginTop: 20 }}>
+              <TouchableOpacity
+                style={styles.buttonReserva}
+                onPress={() => setCurrentStep(3)}
+              >
+                <Text style={styles.buttonText}>Atrás</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.buttonReserva}
+                onPress={handleSubmit}
+              >
+                <Text style={styles.buttonText}>Confirmar Reserva</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+
 
         <View style={styles.calificaciones}>
           <Text
@@ -640,7 +703,7 @@ export default function InicioUsuario() {
           <Text style={{ color: "#ffffff", fontFamily: "BebasNeue", fontSize: 16, marginTop: 10 }}>
             No tienes calificaciones
           </Text>
-          )}
+        )}
       </View>
     </DefaultLayout>
   );

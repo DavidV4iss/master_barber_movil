@@ -160,7 +160,7 @@ export default function Home() {
           </View>
           <View style={{
             ...styles.card,
-            width: Dimensions.get('window').width * 0.4, 
+            width: Dimensions.get('window').width * 0.4,
             height: Dimensions.get('window').width * 0.9,
             marginHorizontal: 10,
             alignItems: 'center',
@@ -183,7 +183,7 @@ export default function Home() {
                 <Button
                   title="VER"
                   color="#dc3545"
-                 
+
                 />
               </View>
             </View>
@@ -280,27 +280,27 @@ export default function Home() {
             const usuario = usuarios.find(u => u.id_usuario === calificacion.usuario_id);
             return (
               <View style={styles.reviewCard} key={index}>
-                  <Image
-                    source={{ uri: `${getBaseURL()}perfil/${usuario?.Foto}  ` }}
-                    style={styles.reviewImage}
-                  />
-                  <Text style={styles.reviewName}>{usuario?.nombre_usuario}</Text>
-                  <Text style={styles.reviewText}>{calificacion.comentario || "Sin Comentario"}</Text>
-                  <View style={{ flex: 1 }} /> 
-                  <View>
-                    <View style={{ height: 1, backgroundColor: '#6c757d', alignSelf: 'stretch', marginTop: 10, marginBottom: 5 }} />
-                    <View style={styles.starsContainer}>
-                      {Array(5).fill(0).map((_, i) => (
-                        <Ionicons
-                          key={i}
-                          name="star"
-                          size={20}
-                          color={i < calificacion.puntuacion ? '#ffc107' : '#ccc'}
-                        />
-                      ))}
-                    </View>
+                <Image
+                  source={{ uri: `${getBaseURL()}perfil/${usuario?.Foto}  ` }}
+                  style={styles.reviewImage}
+                />
+                <Text style={styles.reviewName}>{usuario?.nombre_usuario}</Text>
+                <Text style={styles.reviewText}>{calificacion.comentario || "Sin Comentario"}</Text>
+                <View style={{ flex: 1 }} />
+                <View>
+                  <View style={{ height: 1, backgroundColor: '#6c757d', alignSelf: 'stretch', marginTop: 10, marginBottom: 5 }} />
+                  <View style={styles.starsContainer}>
+                    {Array(5).fill(0).map((_, i) => (
+                      <Ionicons
+                        key={i}
+                        name="star"
+                        size={20}
+                        color={i < calificacion.puntuacion ? '#ffc107' : '#ccc'}
+                      />
+                    ))}
                   </View>
                 </View>
+              </View>
             );
           })}
         </View>
@@ -530,7 +530,7 @@ const styles = StyleSheet.create({
   },
   reviewName: {
     marginTop: 5,
-    marginBottom: 5,  
+    marginBottom: 5,
     color: '#dc3545',
     fontSize: Dimensions.get('window').width * 0.04,
     fontWeight: 'bold',
@@ -544,7 +544,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   starsContainer: {
-    marginTop: 2, 
+    marginTop: 2,
     flexDirection: 'row',
     justifyContent: 'center',
   },

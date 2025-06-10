@@ -49,7 +49,11 @@ class ReservasClientesRepository {
             const response = await API.post("CrearReservas", reserva);
             return response;
         } catch (error) {
-            const errorMessage = error?.response?.data || "Error al crear la reserva.";
+            const errorMessage =
+                error?.response?.data?.message ||
+                error?.response?.data ||
+                error.message ||
+                "Error al crear la reserva.";
             throw new Error(errorMessage);
         }
     }
@@ -98,27 +102,27 @@ class ReservasClientesRepository {
     ///
 
     ///NOTIFICACIONES
-        static async GetNotificaciones(id) {
-            try {
-                const response = await API.get(`GetNotificaciones/${id}`);
-                return response;
-            } catch (error) {
-                const errorMessage = error?.response?.data?.message || "Error al obtener las notificaciones.";
-                throw new Error(errorMessage);
-            }
+    static async GetNotificaciones(id) {
+        try {
+            const response = await API.get(`GetNotificaciones/${id}`);
+            return response;
+        } catch (error) {
+            const errorMessage = error?.response?.data?.message || "Error al obtener las notificaciones.";
+            throw new Error(errorMessage);
         }
+    }
 
-        static async DeleteNotificacion(id_notificacion) {
-            try {
-                const response = await API.delete(`DeleteNotificacion/${id_notificacion}`);
-                return response;
-            } catch (error) {
-                const errorMessage = error?.response?.data?.message || "Error al eliminar la notificación de reserva.";
-                throw new Error(errorMessage);
-            }
+    static async DeleteNotificacion(id_notificacion) {
+        try {
+            const response = await API.delete(`DeleteNotificacion/${id_notificacion}`);
+            return response;
+        } catch (error) {
+            const errorMessage = error?.response?.data?.message || "Error al eliminar la notificación de reserva.";
+            throw new Error(errorMessage);
         }
+    }
 
-    
+
 
 
 
