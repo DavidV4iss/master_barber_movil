@@ -47,7 +47,7 @@ export default function InicioUsuario() {
   const screenWidth = Dimensions.get("window").width;
   const cardWidth = (screenWidth - 60 - 15) / 2;
 
-  const [observacion, setObservacion] = useState(""); // NUEVO: Observación
+  const [observacion, setObservacion] = useState("");
 
   const nextStep = () => {
     if (currentStep === 1 && !service) {
@@ -58,12 +58,10 @@ export default function InicioUsuario() {
       alert("Por favor, selecciona un barbero antes de continuar.");
       return;
     }
-    // Si selecciona Corte básico (id_tipo_servicio === 1), muestra paso de observación
     if (currentStep === 3 && service === 1) {
       setCurrentStep(4);
       return;
     }
-    // Si selecciona Corte premium (id_tipo_servicio === 2), reserva directamente
     if (currentStep === 3 && service === 2) {
       handleSubmit();
       return;
@@ -204,7 +202,7 @@ export default function InicioUsuario() {
         servicio: Number(service),
         fecha: formattedSelectedDate,
         estado: "Pendiente",
-        observacion: observacion.trim() === "" ? null : observacion, // <--- aquí
+        observacion: observacion.trim() === "" ? null : observacion,
       });
 
       showMessage({
@@ -218,7 +216,7 @@ export default function InicioUsuario() {
       setService('');
       setBarberoId('');
       setDate(new Date());
-      setObservacion(""); // Limpia observación
+      setObservacion("");
     } catch (error) {
       console.log("Error al crear la reserva:", error);
       showMessage({
@@ -357,7 +355,6 @@ export default function InicioUsuario() {
         </View>
         <Text style={styles.textReserva}>Crea tu reserva ahora</Text>
 
-        {/* Aqui va el paso a paso Step */}
         {/* Paso 1: Selección de servicio */}
         {currentStep === 1 && (
           <>
@@ -578,7 +575,6 @@ export default function InicioUsuario() {
           </>
         )}
 
-        {/* Paso 4: Observación (solo para Corte básico) */}
         {currentStep === 4 && service === 1 && (
           <>
             <Text style={styles.textPaso}>
