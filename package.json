@@ -1,5 +1,5 @@
 {
-  "name": "movil",
+  "name": "MasterBarber",
   "license": "0BSD",
   "version": "1.0.0",
   "main": "index.js",
@@ -21,6 +21,7 @@
     "@react-navigation/native": "^7.1.8",
     "@react-navigation/stack": "^7.3.1",
     "axios": "^1.9.0",
+    "eas-cli": "^16.17.3",
     "expo": "~53.0.7",
     "expo-constants": "~17.1.5",
     "expo-font": "~13.3.1",

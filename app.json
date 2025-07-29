@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Movil",
-    "slug": "Movil",
+    "name": "MasterBarber",
+    "slug": "MasterBarber",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/LOGO.png",
@@ -21,7 +21,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.fidel_smoke.Movil"
+      "package": "com.fidel_smoke.masterbarber"
     },
     "web": {
       "favicon": "./assets/LOGO.png"
