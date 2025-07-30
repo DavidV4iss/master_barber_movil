@@ -11,7 +11,7 @@ export const getBaseURL = () => {
 
   // 🚀 Producción (web o móvil)
   if (process.env.NODE_ENV === 'production') {
-    return 'https://master-barber-api.onrender.com';
+    return 'https://master-barber-api-va0x.onrender.com';
   }
 
   // 📱 Desarrollo en móvil (Expo Go o emulador)
